@@ -20,6 +20,9 @@ outputs/models/
 # Predicted masks (large, regeneratable)
 outputs/masks_pred/
 
+# Derived CSVs — from private university data, not for sharing
+outputs/csv/
+
 # Python cache
 __pycache__/
 *.pyc
