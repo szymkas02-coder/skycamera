@@ -1,0 +1,58 @@
+# Data — large files, not for sharing
+data/full_raw/
+data/raw/
+data/acs_wsi/
+data/ERA5/
+data/IMGW/
+data/masks_combined/
+data/masks_manual/
+data/partial_cloud_candidates/
+data/random_sample/
+data/random_sample_full/
+data/sam2_checkpoints/
+
+# Roboflow export images (large, reproducible from Roboflow)
+Cloud segmentation nibqv.coco-segmentation/train/*.jpg
+
+# Model weights
+outputs/models/
+
+# Predicted masks (large, regeneratable)
+outputs/masks_pred/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Claude Code internal settings
+.claude/
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Env
+.env
+*.env
+
+# Conda / pip
+*.egg
+
+# src/data symlink or cache
+src/data/

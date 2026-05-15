@@ -1,0 +1,10 @@
+Model,Test set,n,MAE,r,IoU
+ResNet-34,Warsaw GT,126,0.0645,0.9501,0.4409
+MobileNetV2,Warsaw GT,126,0.0596,0.9516,0.4322
+R/B threshold,Warsaw GT,103,0.1428,0.8236,
+R/B threshold,ACS_WSI,16,0.1427,0.8884,
+ResNet-34,ACS_WSI,16,0.0715,0.9028,
+MobileNetV2,ACS_WSI,16,0.0735,0.9332,
+R/B threshold vs ResNet-34 U-Net,Pairwise (full dataset),9276,0.0641,0.9457,
+R/B threshold vs MobileNetV2 U-Net,Pairwise (full dataset),9276,0.0835,0.9189,
+ResNet-34 U-Net vs MobileNetV2 U-Net,Pairwise (full dataset),16585,0.0319,0.9755,

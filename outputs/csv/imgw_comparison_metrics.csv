@@ -1,0 +1,7 @@
+Model,Reference,n,r,MAE,RMSE,Bias
+CNN (ResNet-34),IMGW total (NOG),8119,0.814,0.172,0.255,-0.037
+CNN (ResNet-34),IMGW low (CLCM),8119,0.762,0.214,0.319,0.146
+MobileNetV2,IMGW total (NOG),8119,0.824,0.168,0.25,-0.037
+MobileNetV2,IMGW low (CLCM),8119,0.771,0.21,0.315,0.145
+R/B Threshold,IMGW total (NOG),4684,0.731,0.192,0.276,-0.034
+R/B Threshold,IMGW low (CLCM),4684,0.674,0.251,0.358,0.182

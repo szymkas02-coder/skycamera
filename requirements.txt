@@ -1,0 +1,14 @@
+# Python interpreter: C:\Users\szymo\anaconda3\envs\geo\python.exe
+# Install into geo env: conda activate geo && pip install -r requirements.txt
+
+opencv-python>=4.8
+numpy>=1.26
+pandas>=2.0
+matplotlib>=3.8
+Pillow>=10.0
+scikit-image>=0.22
+torch>=2.2
+torchvision>=0.17
+segmentation-models-pytorch>=0.3   # Stage 8 — CNN segmentation
+ipywidgets>=8.1
+tqdm>=4.66

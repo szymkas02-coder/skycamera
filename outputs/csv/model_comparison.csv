@@ -1,0 +1,4 @@
+Model,MAE,Pearson r,Mean IoU
+MobileNetV2 U-Net,0.0596,0.9514,0.4322
+Random Forest,0.1422,0.8269,0.3633
+ResNet-34 U-Net,0.0648,0.9494,0.4409
