@@ -80,9 +80,6 @@ skycamera/
 # Activate the geo conda environment
 conda activate geo
 
-# Python interpreter (use this directly to avoid Windows PATH issues)
-C:\Users\szymo\anaconda3\envs\geo\python.exe
-
 # Install packages (first time only)
 pip install segmentation-models-pytorch torchvision sam2 pycocotools xarray netcdf4
 ```
@@ -91,9 +88,6 @@ pip install segmentation-models-pytorch torchvision sam2 pycocotools xarray netc
 
 ```powershell
 # Run process_roboflow_labels
-& C:/Users/szymo/anaconda3/envs/geo/python.exe src/skycamera/process_roboflow_labels.py --overwrite
-
-# Equivalent with module syntax
 $env:PYTHONPATH = "src"; python -m skycamera.process_roboflow_labels --overwrite
 ```
 
@@ -260,6 +254,19 @@ Camera barely correlates with ERA5 hcc (r≈0.32) — thin cirrus invisible in R
 Negative bias all methods (−0.034 to −0.077): 70° zenith cutoff clips near-horizon
 cloud that IMGW observer includes. Positive bias vs IMGW CLCM (+0.14): camera
 integrates all cloud layers; CLCM records only the lowest.
+
+---
+
+## License
+
+This repository uses a dual license:
+
+| Scope | License |
+|-------|---------|
+| Code (`src/`, `notebooks/`, scripts) | [MIT](LICENSE-MIT) |
+| Results, figures, model weights, GT masks (`outputs/`, `data/masks_manual/`) | [CC BY 4.0](LICENSE-CC-BY-4.0) |
+
+If you use results or figures in a publication, please cite accordingly.
 
 ---
 
