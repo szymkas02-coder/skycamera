@@ -2,7 +2,7 @@
 Cloud segmentation nibqv - vdataset szymons-workspace-e7cu7
 ==============================
 
-This dataset was exported via roboflow.com on May 12, 2026 at 11:41 AM GMT
+This dataset was exported via roboflow.com on May 15, 2026 at 4:02 PM GMT
 
 Roboflow is an end-to-end computer vision platform that helps you
 * collaborate with your team on computer vision projects
@@ -17,7 +17,7 @@ visit https://github.com/roboflow/notebooks
 
 To find over 100k other datasets and pre-trained models, visit https://universe.roboflow.com
 
-The dataset includes 641 images.
+The dataset includes 735 images.
 Cloud-segmentation are annotated in COCO Segmentation format.
 
 No pre-processing or augmentation was applied.
