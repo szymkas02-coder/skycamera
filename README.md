@@ -270,6 +270,12 @@ If you use results or figures in a publication, please cite accordingly.
 
 ---
 
+## Data Attribution
+
+Sky camera images were provided by the Institute of Geophysics, Faculty of Physics, University of Warsaw via the Poland AOD server. Data access was granted for research purposes. The data is not publicly available and is not included in this repository.
+
+---
+
 ## References
 
 - Long et al. (2006) — R/B ratio threshold method
