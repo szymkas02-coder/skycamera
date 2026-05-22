@@ -11,7 +11,7 @@ Full dataset: 2024 full year, thinned to 30-min intervals (`data/full_raw/`).
 ```
 skycamera/
 ├── Cloud segmentation nibqv.coco-segmentation/
-│   └── train/              ← Roboflow COCO export: ~627 images + _annotations.coco.json
+│   └── train/              ← Roboflow COCO export: 735 images annotated (627 used in last pipeline run)
 ├── data/
 │   ├── raw/                ← original 12-day pilot (kept for reference)
 │   ├── full_raw/           ← full 2024 year, thinned to 30-min intervals (primary dataset)
@@ -20,18 +20,18 @@ skycamera/
 │   ├── acs_wsi/            ← ACS_WSI dataset (Ye et al. 2022), 77 labelled pairs
 │   ├── masks_manual/       ← GT masks (*_GT.png) + labelling_log.csv
 │   │   └── default_ignore.png   ← static antenna/cable mask (applied to every image)
-│   ├── masks_combined/     ← merged dataset index CSV for CNN training
-│   └── sam2_checkpoints/   ← sam2.1_hiera_small.pt (184 MB)
+│   └── masks_combined/     ← merged dataset index CSV for CNN training
 ├── notebooks/
 │   ├── 01_preprocessing.ipynb       ← EDA, dome mask, image index, ACS_WSI loader
 │   ├── 02_rb_threshold.ipynb        ← R/B ratio cloud detection, threshold tuning (daytime only)
-│   ├── 03_cnn_segmentation.ipynb    ← U-Net fine-tuning, evaluation, full run (all images)
-│   ├── 04_gemma_vlm.ipynb           ← Gemma 3 zero-shot via Ollama (slow — see notes)
-│   ├── 05_labelling_tool.ipynb      ← Manual brush labelling tool
-│   ├── 06_comparison.ipynb          ← Head-to-head comparison of all methods
-│   ├── 07_sam2_labelling.ipynb      ← SAM 2 assisted + batch pseudo-labelling
-│   ├── 08_imgw_comparison.ipynb     ← Camera vs IMGW station + ERA5 reanalysis
-│   └── 09_sun_mask_check.ipynb      ← Visual validation of sun disk ignore region
+│   ├── 03_cnn_segmentation.ipynb    ← ResNet-34 U-Net: training, evaluation, full inference
+│   ├── 03b_simpler_models.ipynb     ← MobileNetV2 U-Net + Random Forest
+│   ├── 06_comparison.ipynb          ← head-to-head comparison of all methods
+│   ├── 08_imgw_comparison.ipynb     ← camera vs IMGW station + ERA5 reanalysis
+│   ├── 09_sun_mask_check.ipynb      ← visual validation of sun disk ignore region
+│   └── legacy/
+│       ├── 04_gemma_vlm.ipynb       ← Gemma 3 zero-shot via Ollama (retired — ~10 min/image on CPU)
+│       └── 07_sam2_labelling.ipynb  ← SAM 2 labelling (retired — superseded by Roboflow)
 ├── outputs/
 │   ├── csv/                ← cf_rb_threshold.csv, cf_cnn.csv, cf_mobilenet.csv, image_index.csv, ...
 │   ├── masks_pred/         ← predicted mask PNGs from CNN
@@ -43,13 +43,13 @@ skycamera/
 │   ├── preprocessing.py               ← dome mask, zenith weighting, fisheye reprojection
 │   ├── threshold.py                   ← R/B ratio method (daytime only)
 │   ├── cnn.py                         ← U-Net training and inference
-│   ├── vlm.py                         ← Gemma 3 via Ollama REST API
-│   ├── labelling.py                   ← manual brush labelling tool + _compute_cf
-│   ├── sam_labelling.py               ← SAM 2 assisted + batch pseudo-labelling
 │   ├── sun.py                         ← sun position → pixel projection (pysolar)
+│   ├── process_roboflow_labels.py     ← convert Roboflow COCO export → GT masks
 │   ├── thin_raw.py                    ← thins raw image archive to 30-min intervals
 │   ├── sample_images.py               ← stratified image sampling for labelling
-│   └── process_roboflow_labels.py     ← convert Roboflow COCO export → GT masks
+│   ├── labelling.py                   ← label constants (imported by pipeline); LabellingTool retired
+│   ├── sam_labelling.py               ← SAM 2 tool (retired — superseded by Roboflow)
+│   └── vlm.py                         ← Gemma 3 client (retired — computationally infeasible)
 ├── PIPELINE.md             ← full technical reference for the src/skycamera package
 ├── CLAUDE.md               ← instructions for Claude Code (includes key results + improvement options)
 ├── LITERATURE.md           ← literature review, paper comparison table, citation counts, publication strategy
@@ -105,21 +105,19 @@ See the VLM section below for faster alternatives.
 ## Run order
 
 ```
-process_roboflow_labels.py → [07] → 01 → 02 → 03 → 03b → 06 → 08 → 09
+process_roboflow_labels.py → 01 → 02 → 03 → 03b → 06 → 08 → 09
 ```
 
 | Step | Notebook / Script | Output | Notes |
 |------|------------------|--------|-------|
 | 0 | `process_roboflow_labels.py --overwrite` | GT masks in `masks_manual/` | Run after each new Roboflow export |
 | 1 | `01_preprocessing.ipynb` | `image_index.csv`, plots | EDA only, fast |
-| 2 | `02_rb_threshold.ipynb` | `cf_rb_threshold.csv` | Daytime only; re-tunes threshold on 627 masks |
+| 2 | `02_rb_threshold.ipynb` | `cf_rb_threshold.csv` | Daytime only |
 | 3 | `03_cnn_segmentation.ipynb` | `cf_cnn.csv` | All images (day+night); loads existing weights |
 | 4 | `03b_simpler_models.ipynb` | `cf_mobilenet.csv` | All images; MobileNetV2 + Random Forest |
 | 5 | `06_comparison.ipynb` | `comparison_summary.csv`, plots | Instant — reads CSVs |
 | 6 | `08_imgw_comparison.ipynb` | plots, `imgw_comparison_metrics.csv` | IMGW + ERA5 comparison |
 | 7 | `09_sun_mask_check.ipynb` | `09_sun_mask_check.png` | Visual QA — run after any config change |
-| — | `07_sam2_labelling.ipynb` | GT masks | Optional extra labels |
-| — | `04_gemma_vlm.ipynb` | `cf_gemma.csv` | Optional, very slow on CPU |
 
 ---
 
@@ -128,14 +126,14 @@ process_roboflow_labels.py → [07] → 01 → 02 → 03 → 03b → 06 → 08 �
 ### Method 1 — R/B Ratio Threshold (`threshold.py`)
 Classical statistical method (Long et al. 2006). R/B ≥ threshold → cloud.
 - **Daytime only** — R/B is physically meaningless at night (no Rayleigh scattering)
-- Threshold tuned on Warsaw GT masks (627 masks); ACS_WSI is reference/fallback only
+- Threshold tuned on Warsaw GT masks; ACS_WSI is reference/fallback only
 - Optimal Warsaw threshold: ~0.55 (ACS_WSI would give 0.85 — cameras differ substantially)
 - Fast: < 1 ms/image; suitable for full time-series
 
 ### Method 2 — ResNet-34 U-Net (`cnn.py`, notebook 03)
 Large pretrained encoder, fine-tuned on ACS_WSI + manual/Roboflow labels.
 - Works on **all images** including night (set `apply_daytime_filter=False`)
-- Training: 627 Warsaw masks + 77 ACS_WSI; test set: 20% held-out Warsaw images
+- Training: 627 Warsaw masks + 77 ACS_WSI (last run); 735 masks annotated, retrain pending
 - Input: 512×512, ~50 ms/image CPU inference
 
 ### Method 3 — MobileNetV2 U-Net (`03b_simpler_models.ipynb`)
@@ -147,8 +145,8 @@ Same U-Net framework, lighter encoder (~6.6M vs 24M params).
 No neural network. Per-pixel features: R/B, R/G, HSV, zenith angle, patch stats.
 - Trains in seconds; interpretable via feature importances
 
-### Method 5 — Gemma 3 VLM (`vlm.py`, notebook 04) — optional
-Zero-shot via `gemma3:4b` via Ollama. ~10 min/image on CPU — excluded from notebook 06.
+### Method 5 — Gemma 3 VLM (`vlm.py`, notebook `legacy/04`) — retired
+Zero-shot via `gemma3:4b` via Ollama. ~10 min/image on CPU — computationally infeasible for full dataset. Moved to `notebooks/legacy/`.
 
 ---
 
@@ -158,13 +156,10 @@ All masks live in `data/masks_manual/`. Format: `{stem}_GT.png` colour PNG.
 
 | Source | Count | Notes |
 |--------|-------|-------|
-| Roboflow COCO export | ~627 | Primary batch source — run `process_roboflow_labels.py` |
-| SAM 2 interactive | varies | Near pixel-perfect, ~30 sec/image |
-| SAM 2 batch auto | varies | ~10 sec/image, good for bootstrapping |
-| Manual brush | varies | Slowest but most precise |
+| Roboflow COCO export | 735 annotated (627 used in last run) | Only active source — run `process_roboflow_labels.py` |
 
-`build_combined_dataset()` automatically picks up every `*_GT.png` in the directory
-regardless of which tool created it. All tools log CF to `labelling_log.csv`.
+All masks are generated by `process_roboflow_labels.py` from Roboflow COCO exports.
+SAM 2 and manual brush tools exist in `src/skycamera/` but are retired — see `notebooks/legacy/`.
 
 **CF values in `labelling_log.csv` are area-weighted** using the cosine-zenith weight map
 (`CF_MAX_ZENITH_DEG=70°`) — consistent with how notebooks compute CF.
@@ -172,7 +167,7 @@ regardless of which tool created it. All tools log CF to `labelling_log.csv`.
 ### Default ignore mask
 
 `data/masks_manual/default_ignore.png` marks static structures (antenna mast, cables).
-Applied automatically by all three labelling routes. Created once in notebook 07.
+Applied automatically by `process_roboflow_labels.py`.
 
 ---
 
