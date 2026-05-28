@@ -190,21 +190,6 @@ in `config.py` if it is off, then re-run `process_roboflow_labels.py --overwrite
 
 ---
 
-## Converting Roboflow labels to GT masks
-
-```powershell
-# Convert all images (skip existing)
-& C:/Users/szymo/anaconda3/envs/geo/python.exe src/skycamera/process_roboflow_labels.py
-
-# Overwrite all existing masks (e.g. after config change or new export with updated labels)
-& C:/Users/szymo/anaconda3/envs/geo/python.exe src/skycamera/process_roboflow_labels.py --overwrite
-```
-
-Per image the script: rasterises polygons → fills complement class → applies default_ignore →
-applies sun-disk ignore → skips if too many IGNORE pixels → saves `_GT.png` + logs to CSV.
-
----
-
 ## ACS_WSI dataset
 
 77 labelled pairs (7 per CF level 0–10), 501×501 px, different camera than Warsaw pilot.
